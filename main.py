@@ -13,7 +13,7 @@ import requests
 
 def main():
     # Specify the desired version
-    desired_version = "10.72.3-release.0"
+    desired_version = "10.72.2-release.0"
                                              
 
     # Format the version for the URL
