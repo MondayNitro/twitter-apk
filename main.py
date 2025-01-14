@@ -8,28 +8,23 @@ import apkmirror
 import os
 import shutil
 import zipfile
-
-
-def get_latest_release(versions: list[Version]) -> Version | None:
-    for i in versions:
-        if i.version.find("release") >= 0:
-            return i
+import requests
 
 
 def main():
-    # get latest version
-    url: str = "https://www.apkmirror.com/apk/x-corp/twitter/"
+    # Specify the desired version
+    desired_version = "10.72.3-release.0"
+                                             
+
+    # Format the version for the URL
+    formatted_version = desired_version.replace(".", "-")
+
+    # Download the specific version
+    url = f"https://www.apkmirror.com/apk/x-corp/twitter/twitter-{formatted_version}-release/"
+    
     repo_url: str = "MondayNitro/twitter-apk"
 
-    versions = apkmirror.get_versions(url)
-
-    latest_version = get_latest_release(versions)
-    if latest_version is None:
-        raise Exception("Could not find the latest version")
-
-    # only continue if it's a release
-    if latest_version.version.find("release") < 0:
-        panic("Latest version is not a release version")
+    latest_version = Version(link=url,version=desired_version)
 
     last_build_version: github.GithubRelease | None = github.get_last_build_version(
         repo_url
@@ -39,8 +34,20 @@ def main():
         panic("Failed to fetch the latest build version")
         return
 
+    def get_latest_revanced_patches_version(url="https://api.github.com/repos/crimera/piko/releases"):
+      response = requests.get(url)
+
+      releases_data = response.json()
+
+      for release in releases_data:
+        tag_name = release.get("tag_name")
+        if tag_name:
+          return tag_name
+
+    piko_patches_version = get_latest_revanced_patches_version()
+
     # Begin stuff
-    if last_build_version.tag_name != latest_version.version:
+    if last_build_version.tag_name != f"{latest_version.version}_{piko_patches_version}":
         print(f"New version found: {latest_version.version}")
     else:
         print("No new version found")
@@ -83,6 +90,7 @@ def main():
         for root, dirs, files in os.walk("big_file"):
             for file in files:
                 zip_ref.write(os.path.join(root, file), os.path.join(os.path.relpath(root, "big_file"), file))
+    
     download_apkeditor()
 
     if not os.path.exists("big_file_merged.apk"):
@@ -90,7 +98,7 @@ def main():
         # Delete the big_file directory
         shutil.rmtree("big_file")
     else:
-        print("apkm is already merged")
+        print("apk bundle is already merged")
         shutil.rmtree("big_file")
 
     download_revanced_bins()
