@@ -127,7 +127,7 @@ Changelogs:
     build_apks(latest_version)
 
     publish_release(
-        latest_version.version,
+        f"{latest_version.version}_{pikoRelease['tag_name']}",
         [
             f"twitter-piko-v{latest_version.version}.apk",
         ],
