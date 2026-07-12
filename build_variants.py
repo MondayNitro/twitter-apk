@@ -44,6 +44,9 @@ def build_apks(latest_version: Version):
         "Add ability to copy media link",
         "Bring back twitter",
         "Hide Banner",
+        "More information on profile",
+        "Support external downloader",
+        "Custom share menu",
     ]
 
     common_excludes = []
